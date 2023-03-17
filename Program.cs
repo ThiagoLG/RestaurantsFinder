@@ -10,18 +10,27 @@ class RestaurantFinder
   {
     Console.WriteLine("App running");
 
+    /*- cria os file readers -*/
     var kitchensReader = new StreamReader(File.OpenRead(kitchensPath));
     var restaurantsReader = new StreamReader(File.OpenRead(restaurantsPath));
 
+    /*- envia os file readers e solicita a leitura dos dados das planilhas -*/
     var kitchenItems = getKitchens(kitchensReader);
-    Console.WriteLine(kitchenItems);
+    var restaurantsItems = getRestaurants(restaurantsReader);
 
-    foreach (var item in kitchenItems)
+    /*- indexa os dados de cozinhas, para associar dentro do restaurante -*/
+    var kitchensById = new Dictionary<int?, KitchenModel>();
+    foreach (var kitchenItem in kitchenItems)
+      kitchensById[kitchenItem.Id] = kitchenItem;
+
+    /*- Associa a cozinha dentro do item de restaurante -*/
+    foreach (var restaurantItem in restaurantsItems)
     {
-      Console.WriteLine(item);
+      if (restaurantItem.KitchenId != null)
+        restaurantItem.Kitchen = kitchensById[restaurantItem?.KitchenId];
     }
 
-    Console.WriteLine("pós execução da função");
+    /*- Recebe o input do console -*/
 
   }
 
