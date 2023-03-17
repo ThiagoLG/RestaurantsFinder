@@ -11,15 +11,17 @@ namespace RestaurantsFinder.Models
     public string? Name { get; set; }
     public int? Rating { get; set; }
     public int? Distance { get; set; }
+    public int? Price { get; set; }
     public int? KitchenId { get; set; }
     public KitchenModel? Kitchen { get; set; }
 
 
-    public RestaurantModel(string name, int rating, int distance, int kitchenId)
+    public RestaurantModel(string name, int rating, int distance, int price, int kitchenId)
     {
       this.Name = name;
       this.Rating = rating;
       this.Distance = distance;
+      this.Price = price;
       this.KitchenId = kitchenId;
     }
 
@@ -36,7 +38,10 @@ namespace RestaurantsFinder.Models
         this.Distance = int.Parse(props[2] as dynamic);
 
       if (props.Length > 0)
-        this.KitchenId = int.Parse(props[3] as dynamic);
+        this.Price = int.Parse(props[3] as dynamic);
+
+      if (props.Length > 0)
+        this.KitchenId = int.Parse(props[4] as dynamic);
     }
   }
 }

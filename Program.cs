@@ -8,8 +8,6 @@ class RestaurantFinder
 
   public static void Main(string[] args)
   {
-    Console.WriteLine("App running");
-
     /*- cria os file readers -*/
     var kitchensReader = new StreamReader(File.OpenRead(kitchensPath));
     var restaurantsReader = new StreamReader(File.OpenRead(restaurantsPath));
@@ -19,18 +17,31 @@ class RestaurantFinder
     var restaurantsItems = getRestaurants(restaurantsReader);
 
     /*- indexa os dados de cozinhas, para associar dentro do restaurante -*/
-    var kitchensById = new Dictionary<int?, KitchenModel>();
+    var kitchensById = new Dictionary<int, KitchenModel>();
     foreach (var kitchenItem in kitchenItems)
-      kitchensById[kitchenItem.Id] = kitchenItem;
+      kitchensById.Add(kitchenItem.Id, kitchenItem);
 
     /*- Associa a cozinha dentro do item de restaurante -*/
     foreach (var restaurantItem in restaurantsItems)
-    {
-      if (restaurantItem.KitchenId != null)
-        restaurantItem.Kitchen = kitchensById[restaurantItem?.KitchenId];
-    }
+      restaurantItem.Kitchen = kitchensById[restaurantItem.KitchenId ?? 0];
 
     /*- Recebe o input do console -*/
+    string inputName = getInputData("text", "Informe o termo relacionado ao nome do restaurante: ", false);
+    int inputRating = getInputData("number", "Informe a avaliação mínima do restaurante: ", false);
+    int inputDistance = getInputData("number", "Informe a distância máxima do restaurante: ", false);
+    int inputPrice = getInputData("number", "Informe o preço máximo do restaurante: ", false);
+    string inputKitchen = getInputData("text", "Informe o tipo de cozinha do restaurante: ", false);
+
+    Console.WriteLine("input vazio: " + inputRating);
+
+    /*- Realiza o filtro do conteúdo -*/
+    //IEnumerable<RestaurantModel> finalResults = restaurantsItems.Where(item =>
+    //{
+    //  if (inputName.Length > 0 && !item.Name.Contains(inputName)) return false;
+    //  if (inputRating > 0)
+
+    //    return true;
+    //});
 
   }
 
@@ -64,7 +75,6 @@ class RestaurantFinder
     return kitchenList;
   }
 
-
   private static List<RestaurantModel> getRestaurants(StreamReader fileReader)
   {
     List<RestaurantModel> restaurantsList = new List<RestaurantModel>();
@@ -95,6 +105,42 @@ class RestaurantFinder
     return restaurantsList;
   }
 
+  private static dynamic getInputData(string type, string inputAskmessage, Boolean? requested)
+  {
+    Console.Write(inputAskmessage);
+    var inputText = Console.ReadLine();
+
+    if (
+      inputText != null &&
+      (
+        (requested == true && inputText?.Trim().Length > 0) ||
+        requested == false)
+      )
+    {
+      if (type == "number")
+        try
+        {
+          var parsedInput = int.Parse(inputText as dynamic);
+
+          if (parsedInput > 9999) Console.WriteLine("Valor numérico não pode ser maior que 9999.");
+          else return parsedInput;
+
+        }
+        catch (Exception e)
+        {
+          if (requested == true) Console.WriteLine("Valor numérico inválido.");
+          else return null;
+        }
+      else if (type == "text")
+        return inputText ?? "";
+    }
+    else
+    {
+      Console.WriteLine("Valor inserido inválido.");
+    }
+
+    return getInputData(type, inputAskmessage, requested);
+  }
 
 }
 
@@ -106,6 +152,7 @@ class RestaurantFinder
  • Quando usar modelo e quando usar interface
  • No modelo, eu devo usar propriedades com letra maiúscula?
  • Quando usar array e quando usar List (qual a diferença)
- • 
+ • É possível omitir parâmetro na chamada da função quando for opcional?
+ • Como definir o cabeçalho de uma função para retornar somente int ou string, sem usar dynamic
 
  */
