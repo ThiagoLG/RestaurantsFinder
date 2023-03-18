@@ -37,11 +37,11 @@ class RestaurantFinder
     /*- Realiza o filtro do conteúdo -*/
     IEnumerable<RestaurantModel> finalResults = restaurantsItems.Where(item =>
     {
-      if (inputName?.Length > 0 && (item.Name == null || !item.Name.Contains(inputName))) return false;
-      if (inputRating != null && (item.Rating == null || item.Rating < inputRating)) return false;
+      if (inputName?.Length > 0 && (item.Name == null || !item.Name.ToLower().Contains(inputName))) return false;
       if (inputDistance != null && (item.Distance == null || item.Distance > inputDistance)) return false;
+      if (inputRating != null && (item.Rating == null || item.Rating < inputRating)) return false;
       if (inputPrice != null && (item.Price == null || item.Price > inputPrice)) return false;
-      if (inputKitchen?.Length > 0 && (item.Kitchen == null || item.Kitchen.Name == null || item.Kitchen.Name.Contains(inputKitchen))) return false;
+      if (inputKitchen?.Length > 0 && (item.Kitchen == null || item.Kitchen.Name == null || !item.Kitchen.Name.ToLower().Contains(inputKitchen))) return false;
 
       return true;
     });
@@ -53,21 +53,12 @@ class RestaurantFinder
                                                     .ThenBy(r => r.Price);
 
     /*- Exibe os resultados em tela -*/
+    printColoredMessage("\n------------------------- RESULTADOS DA BUSCA -------------------------\n", ConsoleColor.DarkGreen);
     if (orderedResults.Count() > 0)
-      printColoredMessage("\n------------------------- RESULTADOS DA BUSCA -------------------------\n", ConsoleColor.DarkGreen);
+      printResultsAsTable(orderedResults);
     else
       printColoredMessage("Nenhum restaurante foi localizado com os filtros informados.", ConsoleColor.DarkYellow);
 
-    int index = 1;
-    foreach (RestaurantModel restaurant in orderedResults.Take(5))
-    {
-      printColoredMessage($"#{index}", ConsoleColor.DarkBlue, true);
-      Console.WriteLine($" | {restaurant.ToString()}");
-      index++;
-    }
-
-    if (orderedResults.Count() > 0)
-      printColoredMessage("\n-----------------------------------------------------------------------\n", ConsoleColor.DarkGreen);
 
   }
 
@@ -152,7 +143,7 @@ class RestaurantFinder
       else if (type == "text")
       {
         if (inputText?.Length > max) printColoredMessage($"O tamanho do termo pesquisado não pode exceder {max} caracteres.", ConsoleColor.DarkRed);
-        else return inputText ?? "";
+        else return inputText is string ? inputText?.ToLower() :  "";
       }
     }
     else
@@ -169,6 +160,24 @@ class RestaurantFinder
     if (inline == true) Console.Write(message);
     else Console.WriteLine(message);
     Console.ResetColor();
+  }
+
+  private static void printResultsAsTable(IEnumerable<RestaurantModel> kitchensToPrint)
+  {
+    int index = 1;
+    printColoredMessage("-------------------------------------------------------------------------------------------------------------------", ConsoleColor.DarkCyan);
+    printColoredMessage("| #   | Nome do restaurante                      | Distância (km) | Avaliação (*) | Preço (R$) | Tipo de Cozinha  |", ConsoleColor.DarkCyan);
+    printColoredMessage("-------------------------------------------------------------------------------------------------------------------", ConsoleColor.DarkCyan);
+
+    foreach (RestaurantModel restaurant in kitchensToPrint.Take(5))
+    {
+      Console.Write($"| {index}".PadRight(5, ' '), ConsoleColor.DarkBlue, true);
+      Console.WriteLine($" | {restaurant.ToTableString()}");
+      index++;
+    }
+    printColoredMessage("-------------------------------------------------------------------------------------------------------------------", ConsoleColor.DarkCyan);
+    printColoredMessage("\n-----------------------------------------------------------------------\n", ConsoleColor.DarkGreen);
+
   }
 
 }

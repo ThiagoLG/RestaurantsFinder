@@ -44,6 +44,19 @@ namespace RestaurantsFinder.Models
         this.KitchenId = int.Parse(props[4] as dynamic);
     }
 
+    public string ToTableString()
+    {                                                                                      
+      string stringToPrint = "";
+
+      stringToPrint += $"{Name?.Substring(0, Math.Min(40, Name.Length)).PadRight(40,' ')} | ";
+      stringToPrint += $"{Distance?.ToString().PadLeft(14, ' ')} | ";
+      stringToPrint += $"{Rating?.ToString().PadLeft(13, ' ')} | ";
+      stringToPrint += $"{Price?.ToString().PadLeft(10, ' ')} | ";
+      stringToPrint += $"{Kitchen?.Name?.Substring(0, Math.Min(16, Kitchen.Name.Length)).PadRight(16, ' ')} |";
+
+      return  stringToPrint;
+    }
+
     public override string ToString()
     {
       return $"Nome: {Name} | Avaliação: {Rating} | Distância: {Distance} | Preço: {Price} | Cozinha: {Kitchen?.Name}";
