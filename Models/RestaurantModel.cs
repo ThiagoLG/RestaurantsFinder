@@ -49,5 +49,10 @@ namespace RestaurantsFinder.Models
       return $"Nome: {Name} | Avaliação: {Rating} | Distância: {Distance} | Preço: {Price} | Cozinha: {Kitchen?.Name}";
     }
 
+
+    internal void Deconstruct(out RestaurantModel restaurant, out int index)
+    {
+      throw new NotImplementedException();
+    }
   }
 }

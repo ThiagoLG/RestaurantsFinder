@@ -8,6 +8,7 @@ class RestaurantFinder
 
   public static void Main(string[] args)
   {
+
     /*- cria os file readers -*/
     var kitchensReader = new StreamReader(File.OpenRead(kitchensPath));
     var restaurantsReader = new StreamReader(File.OpenRead(restaurantsPath));
@@ -26,6 +27,7 @@ class RestaurantFinder
       restaurantItem.Kitchen = kitchensById[restaurantItem.KitchenId ?? 0];
 
     /*- Recebe o input do console -*/
+    printColoredMessage("***** Busca de restaurantes ****", ConsoleColor.DarkGreen);
     string? inputName = getInputData("text", "Informe o termo relacionado ao nome do restaurante: ", false, 200);
     int? inputRating = getInputData("number", "Informe a avaliação mínima do restaurante: ", false, 5);
     int? inputDistance = getInputData("number", "Informe a distância máxima do restaurante: ", false, 10);
@@ -51,11 +53,21 @@ class RestaurantFinder
                                                     .ThenBy(r => r.Price);
 
     /*- Exibe os resultados em tela -*/
-    Console.WriteLine("Resultados da busca: ");
+    if (orderedResults.Count() > 0)
+      printColoredMessage("\n------------------------- RESULTADOS DA BUSCA -------------------------\n", ConsoleColor.DarkGreen);
+    else
+      printColoredMessage("Nenhum restaurante foi localizado com os filtros informados.", ConsoleColor.DarkYellow);
+
+    int index = 1;
     foreach (RestaurantModel restaurant in orderedResults.Take(5))
     {
-      Console.WriteLine(restaurant.ToString());
+      printColoredMessage($"#{index}", ConsoleColor.DarkBlue, true);
+      Console.WriteLine($" | {restaurant.ToString()}");
+      index++;
     }
+
+    if (orderedResults.Count() > 0)
+      printColoredMessage("\n-----------------------------------------------------------------------\n", ConsoleColor.DarkGreen);
 
   }
 
@@ -115,7 +127,8 @@ class RestaurantFinder
 
   private static dynamic? getInputData(string type, string inputAskmessage, Boolean requested, int max)
   {
-    Console.Write(inputAskmessage);
+
+    printColoredMessage(inputAskmessage, ConsoleColor.DarkYellow, true);
     var inputText = Console.ReadLine();
 
     if (inputText != null && ((requested == true && inputText?.Trim().Length > 0) || requested == false))
@@ -126,28 +139,36 @@ class RestaurantFinder
         {
           var parsedInput = int.Parse(inputText as dynamic);
 
-          if (parsedInput > max) Console.WriteLine("Valor numérico não pode ser maior que " + max + ".");
+          if (parsedInput > max) printColoredMessage($"Valor numérico não pode ser maior que {max}.", ConsoleColor.DarkRed);
           else return parsedInput;
 
         }
         catch (Exception)
         {
-          if (requested == true) Console.WriteLine("Valor numérico inválido.");
+          if (requested == true) printColoredMessage("Valor numérico inválido.", ConsoleColor.DarkRed);
           else return null;
         }
       }
       else if (type == "text")
       {
-        if (inputText?.Length > max) Console.WriteLine("O tamanho do termo pesquisado não pode exceder " + max + " caracteres.");
+        if (inputText?.Length > max) printColoredMessage($"O tamanho do termo pesquisado não pode exceder {max} caracteres.", ConsoleColor.DarkRed);
         else return inputText ?? "";
       }
     }
     else
     {
-      Console.WriteLine("Valor inserido inválido.");
+      printColoredMessage("Valor inserido inválido.", ConsoleColor.DarkRed);
     }
 
     return getInputData(type, inputAskmessage, requested, max);
+  }
+
+  private static void printColoredMessage(string message, ConsoleColor color, bool inline = false)
+  {
+    Console.ForegroundColor = color;
+    if (inline == true) Console.Write(message);
+    else Console.WriteLine(message);
+    Console.ResetColor();
   }
 
 }
