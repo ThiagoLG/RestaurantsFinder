@@ -43,5 +43,11 @@ namespace RestaurantsFinder.Models
       if (props.Length > 0)
         this.KitchenId = int.Parse(props[4] as dynamic);
     }
+
+    public override string ToString()
+    {
+      return $"Nome: {Name} | Avaliação: {Rating} | Distância: {Distance} | Preço: {Price} | Cozinha: {Kitchen?.Name}";
+    }
+
   }
 }
