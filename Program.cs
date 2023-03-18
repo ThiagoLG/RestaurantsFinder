@@ -14,8 +14,8 @@ class RestaurantFinder
     var restaurantsReader = new StreamReader(File.OpenRead(restaurantsPath));
 
     /*- envia os file readers e solicita a leitura dos dados das planilhas -*/
-    var kitchenItems = getKitchens(kitchensReader);
-    var restaurantsItems = getRestaurants(restaurantsReader);
+    var kitchenItems = getListData<KitchenModel>(kitchensReader);
+    var restaurantsItems = getListData<RestaurantModel>(restaurantsReader);
 
     /*- indexa os dados de cozinhas, para associar dentro do restaurante -*/
     var kitchensById = new Dictionary<int, KitchenModel>();
@@ -59,61 +59,6 @@ class RestaurantFinder
     else
       printColoredMessage("Nenhum restaurante foi localizado com os filtros informados.", ConsoleColor.DarkYellow);
 
-
-  }
-
-  private static List<KitchenModel> getKitchens(StreamReader fileReader)
-  {
-    List<KitchenModel> kitchenList = new List<KitchenModel>();
-
-    if (fileReader == null) return kitchenList;
-
-    var line = fileReader?.ReadLine(); //Atribui já na criação da variável para já tirar o cabeçalho
-
-    while (!string.IsNullOrEmpty(line = fileReader?.ReadLine()))
-    {
-      var kitchenProps = line.Split(',');
-
-      try
-      {
-        var kitchen = new KitchenModel(kitchenProps);
-        kitchenList.Add(kitchen);
-      }
-      catch (Exception e)
-      {
-        Console.WriteLine("Ocorreu um erro na execução. O item de 'cozinha' recebido não corresponde ao esperado");
-        Console.Error.WriteLine(e);
-      }
-    }
-
-    return kitchenList;
-  }
-
-  private static List<RestaurantModel> getRestaurants(StreamReader fileReader)
-  {
-    List<RestaurantModel> restaurantsList = new List<RestaurantModel>();
-
-    if (fileReader == null) return restaurantsList;
-
-    var line = fileReader?.ReadLine(); //Atribui já na criação da variável para já tirar o cabeçalho
-
-    while (!string.IsNullOrEmpty(line = fileReader?.ReadLine()))
-    {
-      var restaurantProps = line.Split(',');
-
-      try
-      {
-        var restaurant = new RestaurantModel(restaurantProps);
-        restaurantsList.Add(restaurant);
-      }
-      catch (Exception e)
-      {
-        Console.WriteLine("Ocorreu um erro na execução. O item de 'restaurante' recebido não corresponde ao esperado");
-        Console.Error.WriteLine(e);
-      }
-    }
-
-    return restaurantsList;
   }
 
   private static dynamic? getInputData(string type, string inputAskmessage, Boolean requested, int max)
@@ -143,7 +88,7 @@ class RestaurantFinder
       else if (type == "text")
       {
         if (inputText?.Length > max) printColoredMessage($"O tamanho do termo pesquisado não pode exceder {max} caracteres.", ConsoleColor.DarkRed);
-        else return inputText is string ? inputText?.ToLower() :  "";
+        else return inputText is string ? inputText?.ToLower() : "";
       }
     }
     else
@@ -178,6 +123,40 @@ class RestaurantFinder
     printColoredMessage("-------------------------------------------------------------------------------------------------------------------", ConsoleColor.DarkCyan);
     printColoredMessage("\n-----------------------------------------------------------------------\n", ConsoleColor.DarkGreen);
 
+  }
+
+  private static List<T> getListData<T>(StreamReader fileReader)
+  {
+    List<T> dataList = new List<T>();
+
+    if (fileReader == null) return dataList;
+
+    var line = fileReader?.ReadLine(); //Atribui já na criação da variável para já tirar o cabeçalho
+
+    while (!string.IsNullOrEmpty(line = fileReader?.ReadLine()))
+    {
+      var dataProps = line.Split(',');
+
+      try
+      {
+        dynamic? dataObj = null;
+
+        if (typeof(T) == typeof(KitchenModel))
+          dataObj = new KitchenModel(dataProps);
+        else if (typeof(T) == typeof(RestaurantModel))
+          dataObj = new RestaurantModel(dataProps);
+
+        if (dataObj != null) dataList.Add(dataObj);
+
+      }
+      catch (Exception e)
+      {
+        Console.WriteLine("Ocorreu um erro na execução. O item de 'cozinha' recebido não corresponde ao esperado");
+        Console.Error.WriteLine(e);
+      }
+    }
+
+    return dataList;
   }
 
 }
