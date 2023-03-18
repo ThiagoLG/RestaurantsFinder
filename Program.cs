@@ -1,4 +1,5 @@
 ﻿using RestaurantsFinder.Models;
+using System.Reflection;
 using System.Runtime.CompilerServices;
 
 class RestaurantFinder
@@ -135,19 +136,12 @@ class RestaurantFinder
 
     while (!string.IsNullOrEmpty(line = fileReader?.ReadLine()))
     {
-      var dataProps = line.Split(',');
+      string[] dataProps = line.Split(',');
 
       try
       {
-        dynamic? dataObj = null;
-
-        if (typeof(T) == typeof(KitchenModel))
-          dataObj = new KitchenModel(dataProps);
-        else if (typeof(T) == typeof(RestaurantModel))
-          dataObj = new RestaurantModel(dataProps);
-
+        var dataObj = (T)Activator.CreateInstance(typeof(T), dataProps)!;
         if (dataObj != null) dataList.Add(dataObj);
-
       }
       catch (Exception e)
       {
